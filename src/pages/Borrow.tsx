@@ -2,19 +2,25 @@ import React, { useState, useEffect } from "react";
 import {
   IonContent,
   IonPage,
+  IonList,
   IonItem,
   IonLabel,
-  IonList,
-  IonLoading,
   IonButton,
+  IonLoading,
   IonToast,
 } from "@ionic/react";
 import { RouteComponentProps } from "react-router-dom";
 
-const CategoryList: React.FC<RouteComponentProps> = ({ history }) => {
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
+interface Borrow {
+  id: number;
+  book: string;
+  user: string;
+  borrowed_at: string;
+  returned_at: string | null;
+}
+
+const BorrowList: React.FC<RouteComponentProps> = ({ history }) => {
+  const [borrows, setBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showToast, setShowToast] = useState<{
     show: boolean;
@@ -22,41 +28,41 @@ const CategoryList: React.FC<RouteComponentProps> = ({ history }) => {
   }>({ show: false, message: "" });
 
   useEffect(() => {
-    fetchCategories();
+    fetchBorrows();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchBorrows = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/categories", {
+      const response = await fetch("http://127.0.0.1:8000/api/borrowings", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch categories");
+        throw new Error("Failed to fetch borrows");
       }
       const data = await response.json();
-      setCategories(data.data);
+      setBorrows(data.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching borrows:", error);
       setLoading(false);
     }
   };
 
-  const handleAddCategory = () => {
-    history.push("/dashboard/categories/add");
+  const handleAddBorrow = () => {
+    history.push("/dashboard/borrows/add");
   };
 
-  const handleEditCategory = (id: number) => {
-    history.push(`/dashboard/categories/${id}/edit`);
+  const handleEditBorrow = (id: number) => {
+    history.push(`/dashboard/borrow/${id}/edit`);
   };
 
-  const handleDeleteCategory = async (id: number) => {
+  const handleDeleteBorrow = async (id: number) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/categories/${id}`,
+        `http://127.0.0.1:8000/api/borrowings/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -65,25 +71,25 @@ const CategoryList: React.FC<RouteComponentProps> = ({ history }) => {
         }
       );
       if (response.ok) {
-        setShowToast({ show: true, message: "Category deleted successfully" });
-        setCategories(categories.filter((category) => category.id !== id));
+        setShowToast({ show: true, message: "Borrow deleted successfully" });
+        setBorrows(borrows.filter((borrow) => borrow.id !== id));
       } else {
         const data = await response.json();
         setShowToast({
           show: true,
-          message: data.message || "Failed to delete category",
+          message: data.message || "Failed to delete borrow",
         });
       }
     } catch (error) {
-      console.error("Error deleting category:", error);
-      setShowToast({ show: true, message: "Error deleting category" });
+      console.error("Error deleting borrow:", error);
+      setShowToast({ show: true, message: "Error deleting borrow" });
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <IonLoading isOpen={loading} message="Loading categories..." />;
+    return <IonLoading isOpen={loading} message="Loading borrows..." />;
   }
 
   return (
@@ -104,31 +110,38 @@ const CategoryList: React.FC<RouteComponentProps> = ({ history }) => {
             padding: "1rem",
           }}
         >
-          <h1>Category</h1>
+          <h1>Borrows</h1>
           <button
-            onClick={handleAddCategory}
+            onClick={handleAddBorrow}
             style={{
               padding: "10px",
               borderRadius: "10px",
               backgroundColor: "green",
             }}
           >
-            ADD Category
+            Add Borrow
           </button>
         </div>
         <IonList>
-          {categories.map((category) => (
-            <IonItem key={category.id}>
-              <IonLabel>{category.name}</IonLabel>
+          {borrows.map((borrow) => (
+            <IonItem key={borrow.id}>
+              <IonLabel>
+                <h2>Book: {borrow.book}</h2>
+                <p>User: {borrow.user}</p>
+                <p>Borrowed At: {borrow.borrowed_at}</p>
+                <p>Returned At: {borrow.returned_at || "Not returned yet"}</p>
+              </IonLabel>
               <IonButton
-                onClick={() => handleEditCategory(category.id)}
-                color="warning"
+                onClick={() => handleEditBorrow(borrow.id)}
+                color="primary"
+                size="small"
               >
                 Edit
               </IonButton>
               <IonButton
-                onClick={() => handleDeleteCategory(category.id)}
+                onClick={() => handleDeleteBorrow(borrow.id)}
                 color="danger"
+                size="small"
               >
                 Delete
               </IonButton>
@@ -140,4 +153,4 @@ const CategoryList: React.FC<RouteComponentProps> = ({ history }) => {
   );
 };
 
-export default CategoryList;
+export default BorrowList;

@@ -43,6 +43,11 @@ const Sidebar: React.FC<SidebarProps> = ({ history }) => {
             <IonIcon icon={layersOutline} slot="start" />
             <IonLabel>Categories</IonLabel>
           </IonItem>
+          {/* detail Peminjaman */}
+          <IonItem button onClick={() => navigateTo("/dashboard/borrow")}>
+            <IonIcon icon={layersOutline} slot="start" />
+            <IonLabel>Borrow</IonLabel>
+          </IonItem>
         </IonList>
       </IonContent>
     </IonMenu>

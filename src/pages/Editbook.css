@@ -1,0 +1,15 @@
+/* Tambahkan ini ke file CSS Anda (misalnya, App.css atau EditBook.css) */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.ion-padding {
+  padding: 20px;
+}
