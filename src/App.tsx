@@ -40,6 +40,8 @@ import "@ionic/react/css/palettes/dark.system.css";
 
 /* Theme variables */
 import "./theme/variables.css";
+import Register from "./pages/Register";
+import DashboardUser from "./pages/user/DashboardUser";
 
 setupIonicReact();
 
@@ -49,7 +51,9 @@ const App: React.FC = () => (
       <Router>
         <Switch>
           <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
           <PrivateRoute path="/dashboard" component={Dashboard} />
+          <PrivateRoute path="/dashboard-user" component={DashboardUser} />
           <Redirect exact from="/" to="/login" />
         </Switch>
       </Router>

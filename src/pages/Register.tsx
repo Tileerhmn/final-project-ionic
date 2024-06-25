@@ -1,85 +1,68 @@
-import React, { useState, useEffect } from "react";
 import {
+  IonButton,
   IonContent,
   IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
   IonInput,
   IonItem,
   IonLabel,
-  IonButton,
   IonLoading,
+  IonPage,
+  IonTitle,
   IonToast,
+  IonToolbar,
 } from "@ionic/react";
-import { RouteComponentProps } from "react-router-dom";
-import "./Login.css";
+import React, { useState, useEffect } from "react";
+import { RouteComponentProps } from "react-router";
 
-interface LoginProps extends RouteComponentProps {}
+interface RegisterProps extends RouteComponentProps {}
 
-const Login: React.FC<LoginProps> = ({ history }) => {
+const Register: React.FC<RegisterProps> = ({ history }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showToast, setShowToast] = useState<{
-    show: boolean;
-    message: string;
-  }>({
+  const [showToast, setShowToast] = useState({
     show: false,
     message: "",
   });
 
-  // if has token, redirect to dashboard
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      history.push("/dashboard");
-    }
-  });
-
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
+      const response = await fetch("http://127.0.0.1:8000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
-
       const data = await response.json();
 
-      if (response.ok && data.status === "success") {
-        localStorage.setItem("token", data.token);
-        if (username === "admin" && password === "admin") {
-          history.push("/dashboard");
-          localStorage.setItem("role", "admin");
-        } else {
-          history.push("/dashboard-user/home");
-          localStorage.setItem("role", "user");
-        }
+      if (response.ok) {
+        history.push("/login");
       } else {
-        setShowToast({ show: true, message: data.message || "Login failed" });
+        setShowToast({
+          show: true,
+          message: data.message || "Register failed",
+        });
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      setShowToast({ show: true, message: "Login error" });
+      console.error("Error during register:", error);
+      setShowToast({ show: true, message: "Register error" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRegister = async () => {
-    history.push("/register");
+  const handleLogin = async () => {
+    history.push("/login");
   };
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Login</IonTitle>
+          <IonTitle>Register</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -99,11 +82,11 @@ const Login: React.FC<LoginProps> = ({ history }) => {
               onIonChange={(e) => setPassword(e.detail.value!)}
             ></IonInput>
           </IonItem>
-          <IonButton expand="full" onClick={handleLogin} disabled={loading}>
-            Login
-          </IonButton>
           <IonButton expand="full" onClick={handleRegister} disabled={loading}>
             Register
+          </IonButton>
+          <IonButton expand="full" onClick={handleLogin} disabled={loading}>
+            Login
           </IonButton>
           <IonLoading isOpen={loading} message={"Please wait..."} />
           <IonToast
@@ -117,5 +100,4 @@ const Login: React.FC<LoginProps> = ({ history }) => {
     </IonPage>
   );
 };
-
-export default Login;
+export default Register;
